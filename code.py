@@ -5,11 +5,14 @@ from adafruit_motor import servo
 import pwmio
 
 pwm = pwmio.PWMOut(board.GP15, duty_cycle=2**15, frequency = 50)
+pwm2 = pwmio.PWMOut(board.GP2, duty_cycle=2**15, frequency = 50)
+pwm3 = pwmio.PWMOut(board.GP3, duty_cycle=2**15, frequency = 50)
+pwm17 = pwmio.PWMOut(board.GP17, duty_cycle=2**15, frequency = 50)
 
 myservo = servo. Servo(pwm)
-#myservo1 = servo. Servo(pwm)
-#myservo1 = servo. Servo(pwm)
-#myservo1 = servo. Servo(pwm)
+#myservo1 = servo. Servo(pwm2)
+#myservo1 = servo. Servo(pwm3)
+#myservo1 = servo. Servo(pwm17)
 #ask about pin 17 in discord
 
 

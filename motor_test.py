@@ -11,10 +11,11 @@ standing_pose = {"FLL":90,"FRL":90,"HLL":90,"HRL":90}
 sitting_pose    = {"FLL":90,"FRL":90,"HLL":0,"HRL":180}
 play_pose       = {"FLL":45,"FRL":130,"HLL":90,"HRL":90}
 tail_wag        = {"FLL":90,"FRL":90,"HLL":90,"HRL":90}
-walk_s1         = {"FLL":0,"FRL":90,"HLL":90,"HRL":90}
-walk_s2         = {"FLL":90,"FRL":0,"HLL":90,"HRL":90}
-walk_s3         = {"FLL":90,"FRL":90,"HLL":0,"HRL":90}
-walk_s4         = {"FLL":90,"FRL":90,"HLL":90,"HRL":0}
+walk_s1         = {"FLL":45,"FRL":90,"HLL":90,"HRL":90}
+walk_s2         = {"FLL":45,"FRL":90,"HLL":90,"HRL":45}
+walk_s3         = {"FLL":90,"FRL":135,"HLL":135,"HRL":90}
+walk_s4         = {"FLL":45,"FRL":90,"HLL":90,"HRL":45}
+walk_s5         = {"FLL":90,"FRL":135,"HLL":135,"HRL":90}
 
 #BEHAVIOR
 direction = ["fwd","back","left","right"]

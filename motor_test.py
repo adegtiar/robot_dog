@@ -14,15 +14,26 @@ import pwmio
 #from adafruit_motor import servo
 
 #FIXED ACTIONS
+
+ANGLE_DELTA = 40
+
 standing_pose = {"FLL":90,"FRL":90,"HLL":90,"HRL":90}
 sitting_pose    = {"FLL":90,"FRL":90,"HLL":0,"HRL":180}
 play_pose       = {"FLL":45,"FRL":130,"HLL":90,"HRL":90}
 tail_wag        = {"FLL":90,"FRL":90,"HLL":90,"HRL":90}
+"""
 walk_s1         = {"FLL":45,"FRL":90,"HLL":90,"HRL":90}
 walk_s2         = {"FLL":45,"FRL":90,"HLL":90,"HRL":45}
 walk_s3         = {"FLL":90,"FRL":135,"HLL":135,"HRL":90}
 walk_s4         = {"FLL":45,"FRL":90,"HLL":90,"HRL":45}
 walk_s5         = {"FLL":90,"FRL":135,"HLL":135,"HRL":90}
+"""
+walk_s1         = {"FLL":90-ANGLE_DELTA,"FRL":90,"HLL":90,"HRL":90}
+walk_s2         = {"FLL":90-ANGLE_DELTA,"FRL":90,"HLL":90,"HRL":90+ANGLE_DELTA}
+walk_s3         = {"FLL":90,"FRL":90+ANGLE_DELTA,"HLL":90-ANGLE_DELTA,"HRL":90}
+walk_s4         = {"FLL":90-ANGLE_DELTA,"FRL":90,"HLL":90,"HRL":90+ANGLE_DELTA}
+walk_s5         = {"FLL":90,"FRL":90+ANGLE_DELTA,"HLL":90-ANGLE_DELTA,"HRL":90}
+walk_orientations = [walk_s1, walk_s2, walk_s3, walk_s4, walk_s5]
 
 #BEHAVIOR
 direction = ["fwd","back","left","right"]
@@ -31,42 +42,105 @@ speed = range(0,100)
 #Accel
 #Decel
 
+LEFT_FRONT_PIN = board.PA02
+RIGHT_FRONT_PIN = board.PA01
+LEFT_BACK_PIN = board.PB09
+RIGHT_BACK_PIN = board.PA03
+
+# TODO: make this less duplicated coded
+
+
+"""
+def init_servo(pin: board.Pin) -> servo.Server:
+    pwm = pwmio.PWMOut(pin, duty_cycle=2**15, frequency = 50)
+    return servo.Servo
+
+
 #take in dirrection and speed and apply to a sequence of moments that move the
 #animal in the dirrection and speed requested.
 
-myservoFL = servo. Servo(pwm)
-myservoFR = servo. Servo(pwm2)
-myservoHL = servo. Servo(pwm3)
-myservoHR = servo. Servo(pwm17)
+SERVOS = {
+    "FLL": init_servo(LEFT_FRONT_PIN),
+    "FRL": init_servo(RIGHT_FRONT_PIN),
+    "HLL": init_servo(LEFT_BACK_PIN),
+    "HRL": init_servo(RIGHT_BACK_PIN),
+}
+
+myservoFL = SERVOS["FLL"]
+myservoFR = SERVOS["FRL"]
+myservoHL = SERVOS["HLL"]
+myservoHR = SERVOS["HRL"]
+
+"""
+
+def init_pwm(pin: board.Pin) -> servo.Server:
+    return pwmio.PWMOut(pin, duty_cycle=2**15, frequency = 50)
+
+
+left_front_pwm = init_pwm(board.PA02)
+right_front_pwm = init_pwm(board.PA01)
+left_back_pwm = init_pwm(board.PB09)
+right_back_pwm = init_pwm(board.PA03)
+
+
+right_front_leg = servo.Servo(right_front_pwm)
+left_front_leg = servo.Servo(left_front_pwm)
+right_back_leg = servo.Servo(right_back_pwm)
+left_back_leg = servo.Servo(left_back_pwm)
+
+myservoFL = left_front_leg
+myservoFR = right_front_leg
+myservoHL = left_back_leg
+myservoHR = right_back_leg
+
+LEGS = {
+    "FLL": left_front_leg,
+    "FRL": right_front_leg,
+    "HLL": left_back_leg,
+    "HRL": right_back_leg,
+}
+
 
 #led = digitalio.DigitalInOut(board.LED)
 #led.direction = digitalio.Direction.OUTPUT
 
+def update_legs(orientations):
+    for leg_id, angle in orientations.items():
+        LEGS[leg_id].angle = angle
+
+
 def move(d,sTp,sPd):
     if(d == "fwd"):
         #s1 #walk_s1         = {"FLL":45,"FRL":90,"HLL":90,"HRL":90}
-        myservoFL.angle = 90 # 0 -> 45
+        for walk_orientation in walk_orientations:
+            update_legs(walk_orientation)
+            input()
+            #time.sleep(1)
+        """
+        LEGS["FLL"].angle = 90 # 0 -> 45
         led.value = True
         time.sleep(1)
         #s2 #walk_s2         = {"FLL":45,"FRL":90,"HLL":90,"HRL":45}
         led.value = False
-        myservoHR.angle = 90 # 0 ->45
-        time.sleep(1)     
+        myservoHR.angle = 135 # 0 ->45
+        time.sleep(1)
+
         #s3  #walk_s3         = {"FLL":90,"FRL":135,"HLL":135,"HRL":90}
         led.value = True
-        myservoFR.angle = 90 # 0 -> 135    
-        myservoHL.angle = 90 # 0 -> 135     
+        myservoFR.angle = 135 # 0 -> 135
+        myservoHL.angle = 90 # 0 -> 135
         time.sleep(1)
         #s4 #walk_s4         = {"FLL":45,"FRL":90,"HLL":90,"HRL":45}
         led.value = False
         myservoFL.angle = 90 # 0 ->45
-        myservoHR.angle = 90 # 0 ->45        
+        myservoHR.angle = 90 # 0 ->45
         time.sleep(1) 
         #s5  #walk_s5         = {"FLL":90,"FRL":135,"HLL":135,"HRL":90}
         led.value = True
-        myservoFR.angle = 90 # 0 -> 135   
-        myservoHL.angle = 90 # 0 -> 135           
-        time.sleep(1)        
+        myservoFR.angle = 90 # 0 -> 135
+        myservoHL.angle = 90 # 0 -> 135
+        time.sleep(1)
+        """
         print("forward walk ",sTp," steps at",sPd," speed")
     if(d == "back"):
         print("backward walk ",sTp," steps at",sPd," speed")
@@ -97,11 +171,8 @@ def find(thing, howLong):
 led = digitalio.DigitalInOut(board.LED_BLUE)
 led.direction = digitalio.Direction.OUTPUT
 
-pwm = pwmio.PWMOut(board.PA01, duty_cycle=2**15, frequency = 50)
-pwm2 = pwmio.PWMOut(board.GP2, duty_cycle=2**15, frequency = 50)
-pwm3 = pwmio.PWMOut(board.GP3, duty_cycle=2**15, frequency = 50)
-pwm17 = pwmio.PWMOut(board.GP17, duty_cycle=2**15, frequency = 50)
 
-
-
-move(direction[1],steps[10],speed[30])
+update_legs(standing_pose)
+time.sleep(1)
+while True:
+    move(direction[0],steps[10],speed[30])

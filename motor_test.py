@@ -35,6 +35,13 @@ walk_s4         = {"FLL":90-ANGLE_DELTA,"FRL":90,"HLL":90,"HRL":90+ANGLE_DELTA}
 walk_s5         = {"FLL":90,"FRL":90+ANGLE_DELTA,"HLL":90-ANGLE_DELTA,"HRL":90}
 walk_orientations = [walk_s1, walk_s2, walk_s3, walk_s4, walk_s5]
 
+Bwalk_s1         = {"FLL":90-ANGLE_DELTA,"FRL":90,"HLL":90,"HRL":90}
+Bwalk_s2         = {"FLL":90-ANGLE_DELTA,"FRL":90,"HLL":90,"HRL":90+ANGLE_DELTA}
+Bwalk_s3         = {"FLL":90,"FRL":90+ANGLE_DELTA,"HLL":90-ANGLE_DELTA,"HRL":90}
+Bwalk_s4         = {"FLL":90-ANGLE_DELTA,"FRL":90,"HLL":90,"HRL":90+ANGLE_DELTA}
+Bwalk_s5         = {"FLL":90,"FRL":90+ANGLE_DELTA,"HLL":90-ANGLE_DELTA,"HRL":90}
+Bwalk_orientations = [Bwalk_s1, Bwalk_s2, Bwalk_s3, Bwalk_s4, Bwalk_s5]
+
 #BEHAVIOR
 direction = ["fwd","back","left","right"]
 steps = range(0,100)

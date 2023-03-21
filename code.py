@@ -12,10 +12,12 @@ import pwmio
 
 ANGLE_DELTA = 40
 
-standing_pose = {"FLL":90,"FRL":90,"HLL":90,"HRL":90}
+standing_pose   = {"FLL":90,"FRL":90,"HLL":90,"HRL":90}
 sitting_pose    = {"FLL":90,"FRL":90,"HLL":0,"HRL":180}
 play_pose       = {"FLL":45,"FRL":130,"HLL":90,"HRL":90}
 tail_wag        = {"FLL":90,"FRL":90,"HLL":90,"HRL":90}
+
+lay_pose        = {"FLL":180,"FRL": 0,"HLL":0,"HRL":180}
 
 walk_s1         = {"FLL":90-ANGLE_DELTA,"FRL":90,"HLL":90,"HRL":90}
 walk_s2         = {"FLL":90-ANGLE_DELTA,"FRL":90,"HLL":90,"HRL":90+ANGLE_DELTA}
@@ -77,17 +79,55 @@ LEGS = {
 #led = digitalio.DigitalInOut(board.LED)
 #led.direction = digitalio.Direction.OUTPUT
 
+DELTA_INCREMENT = 5
+
+class LegOrientation:
+
+    def __init__(self, initial_position=None):
+        self._cur_orientation = initial_position or standing_pose
+
+    def update(self, target_orientation):
+        for interpolated_orientation in self._interpolate(target_orientation):
+            print(interpolated_orientation)
+            update_legs(interpolated_orientation)
+            # Sleep in between delta increments
+            time.sleep(.02)
+
+    def _interpolate(self, target_orientation):
+        # Verify delta is factor of the increment
+        print("interpolating")
+        for leg_id in target_orientation.keys():
+            delta = target_orientation[leg_id] - self._cur_orientation[leg_id]
+            assert delta % DELTA_INCREMENT == 0
+
+        # Update in increments of DELTA increment until you reach target orientation
+        all_equal = False;
+        while not all_equal:
+            all_equal = True
+            # Update the orientation of each leg by positive or negative increment.
+            for leg_id in target_orientation.keys():
+                if self._cur_orientation[leg_id] < target_orientation[leg_id]:
+                    self._cur_orientation[leg_id] += DELTA_INCREMENT
+                    all_equal = False
+                elif self._cur_orientation[leg_id] > target_orientation[leg_id]:
+                    self._cur_orientation[leg_id] -= DELTA_INCREMENT
+                    all_equal = False
+            if not all_equal:
+                yield self._cur_orientation
+
+
 def update_legs(orientations):
     for leg_id, angle in orientations.items():
         LEGS[leg_id].angle = angle
 
 
-def move(d,sTp,sPd):
+def move(d, sTp, sPd, leg_orientations):
     if(d == "fwd"):
         #s1 #walk_s1         = {"FLL":45,"FRL":90,"HLL":90,"HRL":90}
         print("press enter to control steps")
         for walk_orientation in walk_orientations:
-            update_legs(walk_orientation)
+            leg_orientations.update(walk_orientation)
+            #update_legs(walk_orientation)
             input()
             #time.sleep(1)
         print("forward walk ",sTp," steps at",sPd," speed")
@@ -123,7 +163,10 @@ led = digitalio.DigitalInOut(board.LED_BLUE)
 led.direction = digitalio.Direction.OUTPUT
 
 
+leg_orientation = LegOrientation(standing_pose)
 update_legs(standing_pose)
-time.sleep(1)
+#time.sleep(1)
+#update_legs(sitting_pose)
+#time.sleep(3)
 while True:
-    move(direction[0],steps[10],speed[30])
+    move(direction[0],steps[10],speed[30], leg_orientation)
